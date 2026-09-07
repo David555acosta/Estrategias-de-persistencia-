@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "nombre": "Juego de Tronos",
+    "temporadas": 8,
+    "plataforma": "HBO Max",
+    "disponible": true
+  },
+  {
+    "id": 2,
+    "nombre": "Stranger Things",
+    "temporadas": 4,
+    "plataforma": "Netflix",
+    "disponible": true
+  },
+  {
+    "id": 3,
+    "nombre": "The Mandalorian",
+    "temporadas": 3,
+    "plataforma": "Disney+",
+    "disponible": true
+  },
+  {
+    "id": 4,
+    "nombre": "The Boys",
+    "temporadas": 3,
+    "plataforma": "Amazon Prime Video",
+    "disponible": true
+  },
+  {
+    "id": 5,
+    "nombre": "Los Anillos de Poder",
+    "temporadas": 2,
+    "plataforma": "Amazon Prime Video",
+    "disponible": false
+  },
+  {
+    "id": 6,
+    "nombre": "Ted Lasso",
+    "temporadas": 3,
+    "plataforma": "Apple TV+",
+    "disponible": true
+  },
+  {
+    "id": 7,
+    "nombre": "Breaking Bad",
+    "temporadas": 5,
+    "plataforma": "Netflix",
+    "disponible": true
+  },
+  {
+    "id": 8,
+    "nombre": "The Last of Us",
+    "temporadas": 1,
+    "plataforma": "HBO Max",
+    "disponible": true
+  },
+  {
+    "id": 9,
+    "nombre": "Loki",
+    "temporadas": 2,
+    "plataforma": "Disney+",
+    "disponible": false
+  },
+  {
+    "id": 10,
+    "nombre": "La Casa de Papel",
+    "temporadas": 5,
+    "plataforma": "Netflix",
+    "disponible": true
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "name": "estrategias-de-persistencia-",
+  "version": "1.0.0",
+  "description": "Repositorio para practicas de la materia estrategias de persistencia",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/David555acosta/Estrategias-de-persistencia-.git"
+  },
+  "keywords": [],
+  "author": "David Acosta",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/David555acosta/Estrategias-de-persistencia-/issues"
+  },
+  "homepage": "https://github.com/David555acosta/Estrategias-de-persistencia-#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
+  }
+}
