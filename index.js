@@ -4,7 +4,7 @@ const series = require("./data/series.json");
 const app = express();
 const PORT = 3000;
 
-app.use(express.json);
+app.use(express.json());
 
 app.listen(PORT, (err) => {
   if (err) {
@@ -16,13 +16,13 @@ app.listen(PORT, (err) => {
 
 //////////todos
 
-app.get("/series", (req, response) => {
+app.get('/series', (req, response) => {
   response.status(200).json(series);
 });
 
 ////// filtrar por id
 
-app.get("/series/:id", (req, response) => {
+app.get('/series/:id', (req, response) => {
   if (isNaN(req.params.id)) {
     response.status(400).json({ msj: "El id debe ser numerico" });
     return;
@@ -39,7 +39,7 @@ app.get("/series/:id", (req, response) => {
 
 ///// eliminar por id
 
-app.delete("/series/:id", (req, response) => {
+app.delete('/series/:id', (req, response) => {
   if (isNaN(req.params.id)) {
     response.status(400).json({ msj: "El id debe ser numerico" });
     return;
@@ -59,7 +59,18 @@ app.delete("/series/:id", (req, response) => {
 
 /// crear una nueva serie
 
-app.post("/series", (req, response) => {
+app.post('/series', (req, response) => {
   const body = req.body;
-  response.status(201).json(body);
+  const maxId = series.reduce((acum, serie) => {
+    return acum > serie.id ? acum : serie.id
+  }, 0)
+  const serie = {
+    id: maxId + 1,
+    ...body,
+    disponible: true
+  }
+
+  series.push(serie);
+
+  response.status(201).json(serie);
 });
