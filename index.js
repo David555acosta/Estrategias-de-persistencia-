@@ -1,5 +1,5 @@
 const express = require("express");
-const series = require("./data/series.json");
+const db = require('./db/models')
 
 const app = express();
 const PORT = 3000;
@@ -11,66 +11,69 @@ app.listen(PORT, (err) => {
     console.error(err.message);
     process.exit(1);
   }
+  db.sequelize.sync({ force: true })
   console.log(`la APP esta escuchando en el puerto ${PORT}...`);
 });
 
 //////////todos
 
-app.get('/series', (req, response) => {
-  response.status(200).json(series);
+app.get('/series', async (req, response) => {
+  const series = await db.Serie.findAll({})
+  response.status(200).json(series)
 });
 
 ////// filtrar por id
 
-app.get('/series/:id', (req, response) => {
+app.get('/series/:id', async (req, response) => {
   if (isNaN(req.params.id)) {
     response.status(400).json({ msj: "El id debe ser numerico" });
     return;
   }
-  const id = Number(req.params.id);
-  const serieEncontrada = series.find((serie) => serie.id === id);
+  const id = req.params.id
+  const serie = await db.Serie.findByPk(id)
 
-  if (serieEncontrada) {
-    response.status(200).json(serieEncontrada);
+  if (serie) {
+    response.status(200).json(serie)
   } else {
     response.status(404).json({ msg: `el id ${id} no se encuentra.` });
   }
 });
 
+
+
+/// crear una nueva serie
+
+app.post('/series', async (req, response) => {
+  const body = req.body;
+  const serie = await db.Serie.create({
+    nombre: body.nombre,
+    temporadas: body.temps,
+    plataforma: body.plataforma,
+    disponible: true
+  })
+
+  response.status(201).json(serie);
+});
+
+
+
 ///// eliminar por id
 
-app.delete('/series/:id', (req, response) => {
+app.delete('/series/:id', async (req, response) => {
   if (isNaN(req.params.id)) {
     response.status(400).json({ msj: "El id debe ser numerico" });
     return;
   }
-  const id = Number(req.params.id);
-  const indice = series.findIndex((serie) => serie.id === id);
+  const id = req.params.id
+  const serie = await db.Serie.findByPk(id)
 
-  if (indice === -1) {
+  if (!serie) {
     response.status(404).json({ msg: `el id ${id} no se encuentra!.` });
     return;
   }
 
-  const serieBorrada = series.splice(indice, 1);
-
-  response.status(200).json({ msg: "serie eliminada", serie: serieBorrada[0] });
+  await serie.destroy();
+  response.status(200).json({ msg: "serie eliminada", serie: serie });
 });
 
-/// crear una nueva serie
 
-app.post('/series', (req, response) => {
-  const body = req.body;
-  const maxId = series.reduce((acum, serie) => {
-    return acum > serie.id ? acum : serie.id
-  }, 0)
-  const serie = {
-    id: maxId + 1,
-    ...body,
-    disponible: true
-  }
-
-  series.push(serie);
-
-  response.status(201).json(serie);
-});
