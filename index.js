@@ -13,6 +13,6 @@ app.listen(PORT, (err) => {
     console.error(err.message);
     process.exit(1);
   }
-  db.sequelize.sync({ force: true });
+  db.sequelize.sync();
   console.log(`la APP esta escuchando en el puerto ${PORT}...`);
 });
