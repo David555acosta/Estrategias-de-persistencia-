@@ -1,19 +1,17 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Capitulo extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
+      // Pertenece a una Temporada
       Capitulo.belongsTo(models.Temporada, {
         foreignKey: "temporadaId",
         as: "temporada",
       });
     }
   }
+
   Capitulo.init(
     {
       nombre: DataTypes.STRING,
@@ -23,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Capitulo",
-    },
+    }
   );
+
   return Capitulo;
 };
