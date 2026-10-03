@@ -50,9 +50,9 @@ const createSerie = async (req, response) => {
     const body = req.body;
     const serie = await Serie.create({
       nombre: body.nombre,
-      temporadas: body.temporadas,
       plataforma: body.plataforma,
-      disponible: true,
+      fechaEstreno: body.fechaEstreno,
+      disponible: body.disponible ?? true,
     });
 
     if (!serie) {

@@ -1,20 +1,15 @@
 const express = require("express");
 const route = express.Router();
+const { controllerTemporada } = require("../controllers");
 
-const {
-  getAllTemporadas,
-  getTemporadaById,
-  createTemporada,
-  updateTemporada,
-  deleteById,
-} = require("../controllers/temporadaController");
 
-route.get("/temporadas", getAllTemporadas);
 
-route.get("/temporadas/:id", getTemporadaById);
-route.post("/temporadas", createTemporada);
+route.get("/temporadas", controllerTemporada.getAllTemporadas);
 
-route.put("/temporadas/:id", updateTemporada);
-route.delete("/temporadas/:id", deleteById);
+route.get("/temporadas/:id", controllerTemporada.getTemporadaById);
+route.post("/temporadas", controllerTemporada.createTemporada);
+
+route.put("/temporadas/:id", controllerTemporada.updateTemporada);
+route.delete("/temporadas/:id", controllerTemporada.deleteById);
 
 module.exports = route;

@@ -1,20 +1,13 @@
 const express = require("express");
 const route = express.Router();
+const { controllerSerie } = require("../controllers");
 
-const {
-  getAllSeries,
-  getSerieById,
-  createSerie,
-  updateSerie,
-  deleteById,
-} = require("../controllers/serieController");
+route.get("/series", controllerSerie.getAllSeries);
 
-route.get("/series", getAllSeries);
+route.get("/series/:id", controllerSerie.getSerieById);
+route.post("/series", controllerSerie.createSerie);
 
-route.get("/series/:id", getSerieById);
-route.post("/series", createSerie);
-
-route.put("/series/:id", updateSerie);
-route.delete("/series/:id", deleteById);
+route.put("/series/:id", controllerSerie.updateSerie);
+route.delete("/series/:id", controllerSerie.deleteById);
 
 module.exports = route;

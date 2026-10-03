@@ -1,20 +1,15 @@
 const express = require("express");
 const route = express.Router();
+const { controllerCapitulo } = require("../controllers");
 
-const {
-  getAllCapitulos,
-  getCapituloById,
-  createCapitulo,
-  updateCapitulo,
-  deleteById,
-} = require("../controllers/capituloController");
 
-route.get("/capitulos", getAllCapitulos);
 
-route.get("/capitulos/:id", getCapituloById);
-route.post("/capitulos", createCapitulo);
+route.get("/capitulos", controllerCapitulo.getAllCapitulos);
 
-route.put("/capitulos/:id", updateCapitulo);
-route.delete("/capitulos/:id", deleteById);
+route.get("/capitulos/:id", controllerCapitulo.getCapituloById);
+route.post("/capitulos", controllerCapitulo.createCapitulo);
+
+route.put("/capitulos/:id", controllerCapitulo.updateCapitulo);
+route.delete("/capitulos/:id", controllerCapitulo.deleteById);
 
 module.exports = route;
