@@ -11,11 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
 
-      /**Actor.belongsToMany(models['Serie'], {
+      Actor.belongsToMany(models['Serie'], {
         through: "serie_actor",
         as: "series",
-      }); */
-      // define association here
+      });
     }
   }
   Actor.init({

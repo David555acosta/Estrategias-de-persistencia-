@@ -4,10 +4,10 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Serie extends Model {
     static associate(models) {
-      /**Serie.belongsToMany(models['Actor'], {
+      Serie.belongsToMany(models['Actor'], {
         through: "serie_actor",
         as: "actores",
-      }); */
+      });
 
       // Relación 1:N con Temporada
       Serie.hasMany(models.Temporada, {

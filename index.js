@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("./db/models");
 const PORT = 3000;
 const routes = require("./db/routes/index");
+const { FORCE } = require("sequelize/lib/index-hints");
 
 const app = express();
 
@@ -15,6 +16,6 @@ app.listen(PORT, (err) => {
     console.error(err.message);
     process.exit(1);
   }
-  db.sequelize.sync();
+  db.sequelize.sync({ force: true });
   console.log(`la APP esta escuchando en el puerto ${PORT}...`);
 });

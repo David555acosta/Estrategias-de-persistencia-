@@ -1,4 +1,4 @@
-const { Serie } = require("../models");
+const { Serie , Actor } = require("../models");
 
 //////////todos
 
