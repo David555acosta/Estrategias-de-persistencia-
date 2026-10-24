@@ -1,9 +1,9 @@
 const express = require("express");
 const route = express.Router();
-const { controllerActor } = require("../controllers");
+const { controllerActor } = require("../controllers/index");
 const { schemaActor } = require("../schemas");
-const { validadorId, validadorExsitencia, validadorSchema } = require("../middlewares/validadorMiddleware");
-const { Actor } = require("../db/models");
+const { validadorId, validadorExsitencia, validadorSchema } = require("../middlewares/validators");
+const { Actor } = require("../models");
 
 route.get("/actores", controllerActor.getAllActores);
 

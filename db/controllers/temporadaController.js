@@ -1,116 +1,132 @@
-const { Temporada } = require("../models");
+const { Temporada, Serie, Capitulo } = require("../models");
 
-//////////todos
-
-const getAllTemporadas = async (req, response) => {
+const getAllTemporadas = async (req, res) => {
   try {
     const temporadas = await Temporada.findAll({});
-    if (!temporadas) {
-      return response
-        .status(400)
-        .json({ message: "No se encontro ninguna Temporada" });
-    }
-    response.status(200).json(temporadas);
+    res.status(200).json(temporadas);
   } catch (error) {
-    response.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
-////// filtrar por id
-const getTemporadaById = async (req, response) => {
+const getTemporadaById = async (req, res) => {
   try {
-    if (isNaN(req.params.id)) {
-      response.status(400).json({ msj: "El id debe ser numerico" });
-      return;
-    }
-
-    const id = req.params.id;
-    const temporada = await Temporada.findByPk(id);
-
-    if (!temporada) {
-      return response
-        .status(400)
-        .json({ message: "No se encontro ninguna Temporada con este id" });
-    }
-
-    if (temporada) {
-      response.status(200).json(temporada);
-    } else {
-      response.status(404).json({ msg: `el id ${id} no se encuentra.` });
-    }
-  } catch (e) {
-    response.status(500).json({ message: "Error en el servidor" });
+    const { id } = req.params;
+    const temporada = await Temporada.findByPk(id, {
+      include: {
+        model: Serie,
+      },
+    });
+    res.status(200).json(temporada);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
-/// crear una nueva serie
-
-const createTemporada = async (req, response) => {
+const createTemporada = async (req, res) => {
   try {
-    const body = req.body;
+    const { id } = req.params;
+
     const temporada = await Temporada.create({
-      nombre: body.nombre,
-      numero: body.numero,
-      disponible: body.disponible,
-      serieId:body.serieId,
+      ...req.body,
+      serieId: id,
     });
 
-    if (!temporada) {
-      return response.status(400).json({ message: "Error al crear temporada" });
-    }
-
-    response.status(201).json(temporada);
-  } catch (e) {
-    response.status(500).json({ message: "Error en el servidor" });
-  }
-};
-
-/// Actualizar serie
-
-const updateTemporada = async (req, response) => {
-  try {
-    if (isNaN(req.params.id)) {
-      response.status(400).json({ msj: "El id debe ser numerico" });
-      return;
-    }
-
-    const idTemporada = req.params.id;
-    const temporadaActualizada = req.body;
-    const temporada = await Temporada.findByPk(idTemporada);
-
-    if (!temporada) {
-      return response
-        .status(400)
-        .json({ message: "No se encontro ninguna temporada con este id" });
-    }
-
-    await serie.update(temporadaActualizada);
-    response.status(200).json(temporada);
+    res.status(201).json(temporada);
   } catch (error) {
-    response.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
-///// eliminar por id
-
-const deleteById = async (req, response) => {
+const updateTemporada = async (req, res) => {
   try {
-    if (isNaN(req.params.id)) {
-      response.status(400).json({ msj: "El id debe ser numerico" });
-      return;
-    }
-    const id = req.params.id;
+    const { id } = req.params;
     const temporada = await Temporada.findByPk(id);
 
-    if (!temporada) {
-      response.status(404).json({ msg: `el id ${id} no se encuentra!.` });
-      return;
-    }
+    await temporada.update(req.body);
+    res.status(200).json(temporada);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const deleteById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const temporada = await Temporada.findByPk(id);
 
     await temporada.destroy();
-    response.status(200).json({ msg: "temporada eliminada", temporada: temporada });
+    res.status(200).json({ message: "Temporada eliminada", temporada });
   } catch (error) {
-    response.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const getSerieFromTemporada = async (req, res) => {
+  try {
+    const { id } = req.params; // El ID corresponde a la temporada
+
+    const temporada = await Temporada.findByPk(id, {
+      include: {
+        model: Serie,
+        as: "serie",
+      },
+    });
+
+    res.status(200).json(temporada.serie);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+/////////////////////// crud desde temporada a capitulos
+
+const createCapituloFromTemporada = async (req, res) => {
+  try {
+    const { id } = req.params; // ID de la temporada
+
+    const capitulo = await Capitulo.create({
+      ...req.body,
+      temporadaId: id,
+    });
+
+    res.status(201).json(capitulo);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Actualizar un capítulo (el middleware ya validó que existe y pertenece a la temporada)
+const updateCapituloFromTemporada = async (req, res) => {
+  try {
+    const { idCapitulo } = req.params;
+
+    const capitulo = await Capitulo.findByPk(idCapitulo);
+    await capitulo.update(req.body);
+
+    res.status(200).json({
+      message: "Capítulo actualizado exitosamente",
+      capitulo,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// Eliminar un capítulo (el middleware ya validó la pertenencia)
+const deleteCapituloFromTemporada = async (req, res) => {
+  try {
+    const { idCapitulo } = req.params;
+
+    const capitulo = await Capitulo.findByPk(idCapitulo);
+    await capitulo.destroy();
+
+    res.status(200).json({
+      message: "Capítulo eliminado exitosamente",
+      capituloId: idCapitulo,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
@@ -120,4 +136,8 @@ module.exports = {
   createTemporada,
   updateTemporada,
   deleteById,
+  getSerieFromTemporada,
+  createCapituloFromTemporada,
+  updateCapituloFromTemporada,
+  deleteCapituloFromTemporada,
 };

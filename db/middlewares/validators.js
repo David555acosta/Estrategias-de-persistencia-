@@ -1,30 +1,76 @@
-const validadorId = (paramName = "id") => {
-    return (req, res, next) => {
-        const id = req.params[paramName];
-        if (isNaN(id)) {
-            return res.status(400).json({ message: `El parámetro '${paramName}' debe ser numérico` });
-        }
-        next();
-    };
+const validadorId = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!/^\d+$/.test(id) || Number(id) <= 0) {
+    return res.status(400).json({
+      message: `El id ${id} debe ser un número entero mayor a 0`,
+    });
+  }
+
+  next();
 };
 
-
 const validadorExsitencia = (modelo, paramName = "id") => {
-    return async (req, res, next) => {
-        const id = req.params[paramName];
-        const instance = await modelo.findByPk(id);
+  return async (req, res, next) => {
+    const id = req.params[paramName];
+    const instance = await modelo.findByPk(id);
 
-        if (!instance) {
-            return res.status(404).json({
-                message: `El id ${id} no existe en el modelo ${modelo.name}`
-            });
-        }
+    if (!instance) {
+      return res.status(404).json({
+        message: `El id ${id} no existe en el modelo ${modelo.name}`,
+      });
+    }
 
-        next();
-    };
+    next();
+  };
+};
+
+const validadorSchema = (schema) => {
+  return (req, res, next) => {
+    const dataAValidar = req.body;
+    const result = schema.validate(dataAValidar, { abortEarly: false });
+    if (result.error) {
+      return res.status(400).json({
+        errores: result.error.details.map((e) => {
+          return { atributo: e.path[0], error: e.message };
+        }),
+      });
+    }
+
+    next();
+  };
+};
+
+const validadorPertenencia = (
+  ChildModel,
+  parentParamName,
+  childParamName,
+  foreignKey,
+) => {
+  return async (req, res, next) => {
+    const parentId = req.params[parentParamName];
+    const childId = req.params[childParamName];
+
+    const instance = await ChildModel.findOne({
+      where: {
+        id: childId,
+        [foreignKey]: parentId,
+      },
+    });
+
+    if (!instance) {
+      return res.status(404).json({
+        message: `El registro con id ${childId} no existe o no pertenece al padre especificado.`,
+      });
+    }
+
+    next();
+  };
 };
 
 module.exports = {
-    validadorId,
-    validadorExsitencia
+  validadorId,
+  validadorExsitencia,
+  validadorSchema,
+  validadorPertenencia,
 };

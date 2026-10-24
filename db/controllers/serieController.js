@@ -1,123 +1,194 @@
-const { Serie , Actor } = require("../models");
+const { Serie, Actor, Temporada } = require("../models");
 
-//////////todos
-
-const getAllSeries = async (req, response) => {
+const getAllSeries = async (req, res) => {
   try {
     const series = await Serie.findAll({});
-    if (!series) {
-      return response
-        .status(400)
-        .json({ message: "No se encontro ninguna serie" });
-    }
-    response.status(200).json(series);
+    res.status(200).json(series);
   } catch (error) {
-    response.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
-////// filtrar por id
-const getSerieById = async (req, response) => {
+const getSerieById = async (req, res) => {
   try {
-    if (isNaN(req.params.id)) {
-      response.status(400).json({ msj: "El id debe ser numerico" });
-      return;
-    }
-
-    const id = req.params.id;
-    const serie = await Serie.findByPk(id);
-
-    if (!serie) {
-      return response
-        .status(400)
-        .json({ message: "No se encontro ninguna serie con este id" });
-    }
-
-    if (serie) {
-      response.status(200).json(serie);
-    } else {
-      response.status(404).json({ msg: `el id ${id} no se encuentra.` });
-    }
-  } catch (e) {
-    response.status(500).json({ message: "Error en el servidor" });
-  }
-};
-
-/// crear una nueva serie
-
-const createSerie = async (req, response) => {
-  try {
-    const body = req.body;
-    const serie = await Serie.create({
-      nombre: body.nombre,
-      plataforma: body.plataforma,
-      fechaEstreno: body.fechaEstreno,
-      disponible: body.disponible ?? true,
+    const { id } = req.params;
+    const serie = await Serie.findByPk(id, {
+      include: {
+        model: Actor,
+        through: { attributes: [] },
+      },
     });
-
-    if (!serie) {
-      return response.status(400).json({ message: "Error al crear serie" });
-    }
-
-    response.status(201).json(serie);
-  } catch (e) {
-    response.status(500).json({ message: "Error en el servidor" });
-  }
-};
-
-/// Actualizar serie
-
-const updateSerie = async (req, response) => {
-  try {
-    if (isNaN(req.params.id)) {
-      response.status(400).json({ msj: "El id debe ser numerico" });
-      return;
-    }
-
-    const idSerie = req.params.id;
-    const serieActualizada = req.body;
-    const serie = await Serie.findByPk(idSerie);
-
-    if (!serie) {
-      return response
-        .status(400)
-        .json({ message: "No se encontro ninguna serie con este id" });
-    }
-
-    await serie.update(serieActualizada);
-    response.status(200).json(serie);
+    res.status(200).json(serie);
   } catch (error) {
-    response.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
-///// eliminar por id
-
-const deleteById = async (req, response) => {
+const createSerie = async (req, res) => {
   try {
-    if (isNaN(req.params.id)) {
-      response.status(400).json({ msj: "El id debe ser numerico" });
-      return;
-    }
-    const id = req.params.id;
+    const serie = await Serie.create(req.body);
+    res.status(201).json(serie);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const updateSerie = async (req, res) => {
+  try {
+    const { id } = req.params;
     const serie = await Serie.findByPk(id);
 
-    if (!serie) {
-      response.status(404).json({ msg: `el id ${id} no se encuentra!.` });
-      return;
-    }
+    await serie.update(req.body);
+    res.status(200).json(serie);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const deleteById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const serie = await Serie.findByPk(id);
 
     await serie.destroy();
-    response.status(200).json({ msg: "serie eliminada", serie: serie });
+    res.status(200).json({ message: "Serie eliminada", serie });
   } catch (error) {
-    response.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// --- Métodos para la relación 1:N (Asociar/Desasociar Temporadas) ---
+
+const createTemporadaFromSerie = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const serie = await Serie.findByPk(id);
+
+    const nuevaTemporada = await serie.createTemporada(req.body);
+
+    res.status(201).json({
+      message: "Temporada creada y vinculada exitosamente",
+      temporada: nuevaTemporada,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const getTemporadaByIdFromSerie = async (req, res) => {
+  try {
+    const { idTemporada } = req.params;
+
+    const temporada = await Temporada.findByPk(idTemporada);
+
+    res.status(200).json(temporada);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+
+
+
+const getAllTemporadasFromSerie = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const temporadas = await Temporada.findAll({
+      where: { serieId: id },
+    });
+
+    res.status(200).json(temporadas);
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const updateTemporadaFromSerie = async (req, res) => {
+  try {
+    const { idTemporada } = req.params;
+
+    const temporada = await Temporada.findByPk(idTemporada);
+
+    // Actualizamos con los datos validados del body
+    await temporada.update(req.body);
+
+    res.status(200).json({
+      message: "Temporada actualizada exitosamente",
+      temporada,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const deleteTemporadaFromSerie = async (req, res) => {
+  try {
+    const { idTemporada } = req.params;
+
+    const temporada = await Temporada.findByPk(idTemporada);
+
+    await temporada.destroy();
+
+    res.status(200).json({
+      message: "Temporada eliminada exitosamente",
+      temporadaId: idTemporada,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// --- Métodos para la relación N:M (Asociar/Desasociar Actores) ---
+
+const agregarActorASerie = async (req, res) => {
+  try {
+    const { id, idActor } = req.params;
+
+    const serie = await Serie.findByPk(id);
+
+    await serie.addActor(idActor);
+
+    res.status(200).json({
+      message: "Actor vinculado a la serie exitosamente",
+      serieId: id,
+      actorId: idActor,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+const removerActorDeSerie = async (req, res) => {
+  try {
+    const { id, idActor } = req.params;
+
+    const serie = await Serie.findByPk(id);
+
+    await serie.removeActor(idActor);
+
+    res.status(200).json({
+      message: "Actor desvinculado de la serie exitosamente",
+      serieId: id,
+      actorId: idActor,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
 module.exports = {
   getAllSeries,
   getSerieById,
+  createSerie,
   updateSerie,
   deleteById,
-  createSerie,
+  agregarActorASerie,
+  removerActorDeSerie,
+  createTemporadaFromSerie,
+  getTemporadaByIdFromSerie,
+  getAllTemporadasFromSerie,
+  updateTemporadaFromSerie,
+  deleteTemporadaFromSerie,
 };
