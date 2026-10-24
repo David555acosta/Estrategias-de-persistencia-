@@ -1,15 +1,38 @@
 const express = require("express");
 const route = express.Router();
-const { controllerCapitulo } = require("../controllers");
+const { controllerActor } = require("../controllers");
+const { schemaActor } = require("../schemas");
+const { validadorId, validadorExsitencia, validadorSchema } = require("../middlewares/validadorMiddleware");
+const { Actor } = require("../db/models");
 
+route.get("/actores", controllerActor.getAllActores);
 
+route.get(
+    "/actores/:id",
+    validadorId("id"),
+    validadorExsitencia(Actor, "id"),
+    controllerActor.getActorById
+);
 
-route.get("/capitulos", controllerCapitulo.getAllCapitulos);
+route.post(
+    "/actores",
+    validadorSchema(schemaActor),
+    controllerActor.createActor
+);
 
-route.get("/capitulos/:id", controllerCapitulo.getCapituloById);
-route.post("/capitulos", controllerCapitulo.createCapitulo);
+route.put(
+    "/actores/:id",
+    validadorId("id"),
+    validadorExsitencia(Actor, "id"),
+    validadorSchema(schemaActor),
+    controllerActor.updateActor
+);
 
-route.put("/capitulos/:id", controllerCapitulo.updateCapitulo);
-route.delete("/capitulos/:id", controllerCapitulo.deleteById);
+route.delete(
+    "/actores/:id",
+    validadorId("id"),
+    validadorExsitencia(Actor, "id"),
+    controllerActor.deleteById
+);
 
 module.exports = route;
