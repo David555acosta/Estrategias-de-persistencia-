@@ -1,14 +1,18 @@
-const validadorId = (req, res, next) => {
-  const { id } = req.params;
+const validadorId = (paramName = 'id') => {
+  return (req, res, next) => {
+    const id = req.params[paramName];
 
-  if (!/^\d+$/.test(id) || Number(id) <= 0) {
-    return res.status(400).json({
-      message: `El id ${id} debe ser un número entero mayor a 0`,
-    });
-  }
+    if (!id || !/^\d+$/.test(id) || Number(id) <= 0) {
+      return res.status(400).json({
+        message: `El campo '${paramName}' con valor '${id}' debe ser un número entero mayor a 0`,
+      });
+    }
 
-  next();
+    next();
+  };
 };
+
+module.exports = { validadorId };
 
 const validadorExsitencia = (modelo, paramName = "id") => {
   return async (req, res, next) => {

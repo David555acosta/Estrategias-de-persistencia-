@@ -5,6 +5,7 @@ const { schemaActor } = require("../schemas");
 const { validadorId, validadorExsitencia, validadorSchema } = require("../middlewares/validators");
 const { Actor } = require("../models");
 
+// --- CRUD Básico de Actores ---
 route.get("/actores", controllerActor.getAllActores);
 
 route.get(

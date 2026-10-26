@@ -10,6 +10,7 @@ app.use(express.json());
 app.use("/", routes.seriesRutas);
 app.use("/", routes.temporadaRutas);
 app.use("/", routes.capituloRutas);
+app.use("/", routes.actorRoutes);
 
 app.listen(PORT, (err) => {
   if (err) {

@@ -1,20 +1,21 @@
 const express = require("express");
 const route = express.Router();
 const { controllerTemporada } = require("../controllers/index");
-const {schemaTemporada , schemaCapitulo} = require("../schemas");
+const { schemaTemporada, schemaCapitulo } = require("../schemas");
 const {
   validadorId,
   validadorExsitencia,
   validadorSchema,
+  validadorPertenencia,
 } = require("../middlewares/validators");
-const { Serie, Temporada } = require("../models");
+const { Serie, Temporada, Capitulo } = require("../models");
 
 // --- CRUD Básico de temporadas ---
 route.get("/temporadas", controllerTemporada.getAllTemporadas);
 
 route.get(
   "/temporadas/:id",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
   controllerTemporada.getTemporadaById,
 );
@@ -27,7 +28,7 @@ route.post(
 
 route.put(
   "/temporadas/:id",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
   validadorSchema(schemaTemporada),
   controllerTemporada.updateTemporada,
@@ -35,46 +36,43 @@ route.put(
 
 route.delete(
   "/temporadas/:id",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
   controllerTemporada.deleteById,
 );
 
 route.get(
   "/temporadas/:id/series",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
   controllerTemporada.getSerieFromTemporada,
 );
 
 // --- Operaciones de Capítulos anidadas desde Temporada ---
 
-// 1. Crear capítulo en una temporada
 route.post(
   "/temporadas/:id/capitulos",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
   validadorSchema(schemaCapitulo),
   controllerTemporada.createCapituloFromTemporada,
 );
 
-// 2. Actualizar capítulo asegurando pertenencia a la temporada
 route.put(
   "/temporadas/:id/capitulos/:idCapitulo",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
-  validadorId,
+  validadorId("idCapitulo"),
   validadorPertenencia(Capitulo, "id", "idCapitulo", "temporadaId"),
   validadorSchema(schemaCapitulo),
   controllerTemporada.updateCapituloFromTemporada,
 );
 
-// 3. Eliminar capítulo asegurando pertenencia a la temporada
 route.delete(
   "/temporadas/:id/capitulos/:idCapitulo",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Temporada, "id"),
-  validadorId,
+  validadorId("idCapitulo"),
   validadorPertenencia(Capitulo, "id", "idCapitulo", "temporadaId"),
   controllerTemporada.deleteCapituloFromTemporada,
 );

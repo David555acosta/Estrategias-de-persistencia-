@@ -14,8 +14,12 @@ const getSerieById = async (req, res) => {
     const { id } = req.params;
     const serie = await Serie.findByPk(id, {
       include: {
+        model: Temporada,
+        as: "temporadas",
+      },
+      include: {
         model: Actor,
-        through: { attributes: [] },
+        as: "actor",
       },
     });
     res.status(200).json(serie);
@@ -88,9 +92,6 @@ const getTemporadaByIdFromSerie = async (req, res) => {
   }
 };
 
-
-
-
 const getAllTemporadasFromSerie = async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,17 +145,10 @@ const deleteTemporadaFromSerie = async (req, res) => {
 
 const agregarActorASerie = async (req, res) => {
   try {
-    const { id, idActor } = req.params;
-
-    const serie = await Serie.findByPk(id);
-
-    await serie.addActor(idActor);
-
-    res.status(200).json({
-      message: "Actor vinculado a la serie exitosamente",
-      serieId: id,
-      actorId: idActor,
-    });
+    const serie = await Serie.findByPk(req.params.id);
+    const actor = await Actor.findByPk(req.params.idActor);
+    await serie.addActor(actor);
+    res.status(201).json({ mensaje: `El actor ${actor.nombre} fue agregado a la serie ${serie.nombre}` });
   } catch (error) {
     res.status(500).json({ message: "Error en el servidor" });
   }

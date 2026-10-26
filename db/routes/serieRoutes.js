@@ -1,6 +1,6 @@
 const express = require("express");
 const route = express.Router();
-const { controllerSerie} = require("../controllers/index");
+const { controllerSerie } = require("../controllers/index");
 const { schemaSerie, schemaTemporada } = require("../schemas");
 const {
   validadorId,
@@ -10,12 +10,12 @@ const {
 } = require("../middlewares/validators");
 const { Serie, Actor, Temporada } = require("../models");
 
-// CRUD básico de Series
+// --- CRUD básico de Series ---
 route.get("/series", controllerSerie.getAllSeries);
 
 route.get(
   "/series/:id",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
   controllerSerie.getSerieById,
 );
@@ -28,7 +28,7 @@ route.post(
 
 route.put(
   "/series/:id",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
   validadorSchema(schemaSerie),
   controllerSerie.updateSerie,
@@ -36,7 +36,7 @@ route.put(
 
 route.delete(
   "/series/:id",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
   controllerSerie.deleteById,
 );
@@ -45,7 +45,7 @@ route.delete(
 
 route.post(
   "/series/:id/temporadas",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
   validadorSchema(schemaTemporada),
   controllerSerie.createTemporadaFromSerie
@@ -53,26 +53,23 @@ route.post(
 
 route.get(
   "/series/:id/temporadas/:idTemporada",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
   validadorId("idTemporada"),
   validadorPertenencia(Temporada, "id", "idTemporada", "serieId"),
   controllerSerie.getTemporadaByIdFromSerie,
 );
 
-
 route.get(
   "/series/:id/temporadas/",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
-  validadorId("idTemporada"),
   controllerSerie.getAllTemporadasFromSerie,
 );
 
-
 route.put(
   "/series/:id/temporadas/:idTemporada",
-  validadorId,
+  validadorId("id"),
   validadorExsitencia(Serie, "id"),
   validadorId("idTemporada"),
   validadorPertenencia(Temporada, "id", "idTemporada", "serieId"),

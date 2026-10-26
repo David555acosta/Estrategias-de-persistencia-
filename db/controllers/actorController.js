@@ -12,12 +12,9 @@ const getAllActores = async (req, res) => {
 const getActorById = async (req, res) => {
   try {
     const { id } = req.params;
-    const actor = await Actor.findByPk(id, {
-      include: {
-        model: Serie,
-        through: { attributes: [] }, // Opcional: oculta la tabla intermedia si no querés ver sus metadatos
-      },
-    });
+    const actor = await Actor.findByPk(id , {
+      
+    })
     res.status(200).json(actor);
   } catch (error) {
     res.status(500).json({ message: "Error en el servidor" });
